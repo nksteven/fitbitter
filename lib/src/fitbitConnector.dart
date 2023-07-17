@@ -18,25 +18,35 @@ class FitbitCredentials {
   /// The Fitbit refresh token associated to the credentials.
   String fitbitRefreshToken;
 
+  int expiresIn;
+
   /// Default constructor of [FitbitCredentials].
   FitbitCredentials({
     required this.userID,
     required this.fitbitAccessToken,
     required this.fitbitRefreshToken,
+    required this.expiresIn,
   });
 
   /// Method to be used to create new [FitbitCredentials] fobjet from the current one
   /// as its copy with (possibly) new [userID], [fitbitAccessToken], and/or [fitbitRefreshToken].
   FitbitCredentials copyWith(
-      {String? userID, String? fitbitAccessToken, String? fitbitRefreshToken}) {
+      {String? userID,
+      String? fitbitAccessToken,
+      String? fitbitRefreshToken,
+      int? expiresIn}) {
     String u = userID == null ? this.userID : userID;
     String fa =
         fitbitAccessToken == null ? this.fitbitAccessToken : fitbitAccessToken;
     String fr = fitbitRefreshToken == null
         ? this.fitbitRefreshToken
         : fitbitRefreshToken;
+    int tea = expiresIn == null ? this.expiresIn : expiresIn;
     return FitbitCredentials(
-        userID: u, fitbitAccessToken: fa, fitbitRefreshToken: fr);
+        userID: u,
+        fitbitAccessToken: fa,
+        fitbitRefreshToken: fr,
+        expiresIn: tea);
   } //copyWith
 
   @override
@@ -102,8 +112,11 @@ class FitbitConnector {
     // Overwrite the fitbit credentials and return them
     final accessToken = response.data['access_token'] as String;
     final refreshToken = response.data['refresh_token'] as String;
+    final expiresIn = response.data['expires_in'] as int;
     return fitbitCredentials.copyWith(
-        fitbitAccessToken: accessToken, fitbitRefreshToken: refreshToken);
+        fitbitAccessToken: accessToken,
+        fitbitRefreshToken: refreshToken,
+        expiresIn: expiresIn);
   } // refreshToken
 
   /// Method that checks if the current token is still valid to be used
@@ -194,11 +207,13 @@ class FitbitConnector {
       final accessToken = response.data['access_token'] as String;
       final refreshToken = response.data['refresh_token'] as String;
       final userID = response.data['user_id'] as String;
+      final expiresIn = response.data['expires_in'] as int;
 
       fitbitCredentials = FitbitCredentials(
           userID: userID,
           fitbitAccessToken: accessToken,
-          fitbitRefreshToken: refreshToken);
+          fitbitRefreshToken: refreshToken,
+          expiresIn: expiresIn);
     } catch (e) {
       print(e);
     } // catch
